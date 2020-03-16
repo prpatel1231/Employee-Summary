@@ -5,9 +5,9 @@ const Manager = require('./lib/manager');
 const Intern = require('./lib/intern');
 const Engineer = require('./lib/engineer');
 // Create arrays that will hold html cards for each employee
-var managerList = [];
-var engineerList = [];
-var internList = [];
+var managers = [];
+var engineers = [];
+var interns = [];
 
 // Main app function
 function startApp() {
@@ -28,7 +28,7 @@ function startApp() {
             addIntern();
         } else if (data.employeeType === "Save and Exit") {
             // Generate the HTML passing the employee arrays, write it to a file in the /output folder, then exit the app
-            var HTML = generateHTML(managerList, engineerList, internList)
+            var HTML = generateHTML(managers, engineers, interns)
             console.log("Success! Your team profile is complete!")
             fs.writeFileSync(path.join(__dirname, "output/teamprofile.html"), HTML, function (err) {
                 if (err) { return console.log(err) }
@@ -36,16 +36,16 @@ function startApp() {
             process.exit()
         } else {
             // Reset all html cards and exit the app
-            managerList = []
-            engineerList = []
-            internList = []
+            managers = []
+            engineers = []
+            interns = []
             process.exit()
         }
     });
 };
 
 function addManager() {
-    // Ask the user for Manager details, then push the html card output to the managerList array
+    // Ask the user for Manager details
     inquirer.prompt([
         {
             name: "name",
@@ -63,19 +63,19 @@ function addManager() {
             message: "Please enter the new Manager's office number:"
         }
     ]).then(function (data) {
-        // Make a new manager with the user responses and manager subclass
+        // Make a new manager
         var newManager = new Manager(data.name, data.id, data.office)
 
         var newManagerCard = `<div class="card text-white bg-dark my-3 mx-auto" style="max-width: 18rem;">
         <div class="card-header">${newManager.name}</div>
         <div class="card-body">
-          <p class="card-text">Employee ID: #${this.id}</p>
+          <p class="card-text">Employee ID: #${newManager.id}</p>
           <p class="card-title">Portfolio: <a href="https://github.com/${newManager.github}">${newManager.github}</a></p>
         </div>
       </div>`
 
     
-        managerList.push(newManagerCard)
+        managers.push(newManagerCard)
         // Restart the app
         console.log("Add another Employee?")
         startApp()
@@ -84,7 +84,7 @@ function addManager() {
 };
 
 function addEngineer() {
-    // Ask for Engineer details, then push the html card output to the engineerList array
+
     inquirer.prompt([
         {
             name: "name",
@@ -102,7 +102,7 @@ function addEngineer() {
             message: "Please enter the new Engineer's Github username:"
         }
     ]).then(function (data) {
-        // Make a new Engineer with the user response and Engineer subclass
+        // Make a new Engineer with the user response
         var newEngineer = new Engineer(data.name, data.id, data.username)
         var newEngineerCard = `<div class="card text-white bg-dark my-3 mx-auto" style="max-width: 18rem;">
         <div class="card-header">${newEngineer.name}</div>
@@ -112,7 +112,7 @@ function addEngineer() {
         </div>
       </div>`
 
-        engineerList.push(newEngineerCard)
+        engineers.push(newEngineerCard)
         // Restart the app
         console.log("Add another Employee?")
         startApp()
@@ -120,7 +120,6 @@ function addEngineer() {
 };
 
 function addIntern() {
-    // Ask for intern details, then push the html card output to the internList array
     inquirer.prompt([
         {
             name: "name",
@@ -138,7 +137,7 @@ function addIntern() {
             message: "Please enter the name of the intern's school:"
         }
     ]).then(function (data) {
-        // Make a new Intern with the user response and Intern subclass
+        // Make a new Intern with the user response and Intern class
         var newIntern = new Intern(data.name, data.id, data.school)
         var newInternCard = `<div class="card text-white bg-dark my-3 mx-auto" style="max-width: 18rem;">
         <div class="card-header">${newIntern.name}</div>
@@ -147,15 +146,14 @@ function addIntern() {
           <p class="card-title">Portfolio: <a href="https://github.com/${newIntern.github}">${newIntern.github}</a></p>
         </div>
       </div>`
-        internList.push(newInternCard)
+        interns.push(newInternCard)
         // Restart the app
         console.log("Add another Employee?")
         startApp()
     })
 };
-// Function takes in 3 parameters (the 3 employee arrays which are all html cards) 
-//                       and creates an HTML page with the employee cards included
-function generateHTML(managers, engineers, interns) {
+// Function takes in 3 arrays of HTML one for each manager, engineer & intern and populates the main html
+function generateHTML(managersArray, engineersArray, internsArray) {
     return `<!DOCTYPE html>
     <html lang="en">
     <head>
@@ -174,15 +172,15 @@ function generateHTML(managers, engineers, interns) {
             <div class="row border-top">
                 <div class="col text-center" id="managers">
                     <div class="row bg-dark py-1"><h3 class="text-light mx-auto">Manager</h3></div>
-                  ${managers.join("\n")}
+                  ${managersArray.join("\n")}
                 </div>
                 <div class="col text-center" id="engineers">
                     <div class="row bg-dark py-1"><h3 class="text-light mx-auto">Engineers</h3></div>
-                    ${engineers.join("\n")}
+                    ${engineersArray.join("\n")}
                 </div>
                 <div class="col text-center" id="interns">
                     <div class="row bg-dark py-1"><h3 class="text-light mx-auto">Interns</h3></div>
-                    ${interns.join("\n")}
+                    ${internsArray.join("\n")}
                 </div>
             </div>
         </div>
